@@ -1,21 +1,18 @@
 {
   "openapi" : "3.0.0",
   "info" : {
-    "title" : "The Trust.med Data API",
-    "description" : "API that facilitates the storage of data in multiple formats.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through normal \"Bearer Auth\" methods where a token is gathered and then\nappended to the header in order to prove identity. This API also allows for Certificate based Authentication, though\nthis method is not supported for authentication in the API documentation. \n\nIn order to conduct Certificate Based Authentication, please follow the below steps:\n\n1) Contact Trust.med to be provided a personalized public key.\n2) Attach your public key to your request.\n```\n  curl --cert provided_public_cert.pem -X POST -d '{\"foo\": \"bar\"}'  https://...data.trust.med/v1/client/{client_id}\n```\n3) Evaluate the response and response status code.\n\n***\n",
+    "title" : "The Trust.med Partner API",
+    "description" : "API that facilitates the storage of data for partners in multiple formats. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: This method is not supported for authentication in the API documentation. \n\nIn order to conduct Certificate Based Authentication, please follow the below steps:\n\n1) Generate a self-siging CA Cert (or use an accepted signed like Verisign)\n2) Trade public keys of CA or CA bundles with Trust.med\n3) Generate your client certificate and public key with your CA from above\n4) Sign your request with your private key, attach your CA cert to the request.\n\n***\n",
     "termsOfService" : "https://www.trust.med/terms-and-conditions/",
     "contact" : {
-      "name" : "John Winkler",
-      "email" : "JWinkler@trust.med"
+      "name" : "Trust.med Support",
+      "email" : "support@trust.med"
     },
     "version" : "1.0.0"
   },
   "servers" : [ {
-    "url" : "https://staging.data.trust.med/v1",
+    "url" : "https://staging.partner.trust.med/v1",
     "description" : "Testing server"
-  }, {
-    "url" : "https://data.trust.med/v1",
-    "description" : "Live server"
   }, {
     "url" : "https://virtserver.swaggerhub.com/JWinkler05/MED_DATASTORE_API/1.0.0",
     "description" : "SwaggerHub API Auto Mocking"
@@ -55,20 +52,31 @@
         "security" : [ ]
       }
     },
-    "/client/{clientId}" : {
+    "/client/{clientGLN}/storage" : {
       "post" : {
         "tags" : [ "Storage" ],
-        "description" : "Send and store data objects within the Trust.med system. Currently is able to accept the following as request content types: JSON Object, XML EPCIS Event or a Binary file.",
+        "description" : "Send and store data documents within the Trust.med system. Currently is able to accept the following as request content types: JSON Documents, XML EPCIS Event or a Binary file.",
         "parameters" : [ {
-          "name" : "clientId",
+          "name" : "clientGLN",
           "in" : "path",
-          "description" : "The UUID4 of the client for which the posted file should be attributed.",
+          "description" : "The GLN of the client for which the posted file should be attributed.",
           "required" : true,
           "style" : "simple",
           "explode" : false,
           "schema" : {
             "type" : "string",
-            "format" : "uuid4"
+            "format" : "string"
+          }
+        }, {
+          "name" : "shipToGLN",
+          "in" : "query",
+          "description" : "The destination GLN for the file being stored",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "string"
           }
         } ],
         "requestBody" : {
@@ -106,7 +114,63 @@
             "description" : "User's credentials or token is invalid."
           },
           "404" : {
-            "description" : "ClientId provided is not found."
+            "description" : "ClientGLN provided is not found."
+          }
+        }
+      }
+    },
+    "/client/{clientGLN}/message" : {
+      "post" : {
+        "tags" : [ "Message" ],
+        "description" : "Send a message to a client as a JSON object with a message parameter",
+        "parameters" : [ {
+          "name" : "clientGLN",
+          "in" : "path",
+          "description" : "The GLN of the client receiving the message",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        }, {
+          "name" : "messageFromGLN",
+          "in" : "query",
+          "description" : "The GLN of the location sending the message to the client.",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Message"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Message was successfully sent to partner.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "User's credentials or token is invalid."
+          },
+          "404" : {
+            "description" : "ClientGLN provided is not found."
           }
         }
       }
@@ -114,6 +178,15 @@
   },
   "components" : {
     "schemas" : {
+      "Message" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string",
+            "format" : "string"
+          }
+        }
+      },
       "EPCISDocument" : {
         "type" : "object",
         "properties" : {
@@ -192,6 +265,23 @@
             "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
           },
           "created_at" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "uuid4",
+            "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
+          },
+          "message_body" : {
+            "type" : "string",
+            "format" : "string"
+          },
+          "message_sent" : {
             "type" : "string",
             "format" : "date"
           }
