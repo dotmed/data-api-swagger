@@ -2,7 +2,7 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "The Trust.med Partner API",
-    "description" : "API that facilitates the storage of data for partners in multiple formats. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: This method is not supported for authentication in the API documentation. \n\nIn order to conduct Certificate Based Authentication, please follow the below steps:\n\n1) Generate a self-siging CA Cert (or use an accepted signed like Verisign)\n2) Trade public keys of CA or CA bundles with Trust.med\n3) Generate your client certificate and public key with your CA from above\n4) Sign your request with your private key, attach your CA cert to the request.\n\n***\n",
+    "description" : "API that facilitates the storage of data for partners in multiple formats. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact Trust.med support, \nthey will assist you on completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
     "termsOfService" : "https://www.trust.med/terms-and-conditions/",
     "contact" : {
       "name" : "Trust.med Support",
@@ -14,7 +14,7 @@
     "url" : "https://staging.partner.trust.med/v1",
     "description" : "Testing server"
   }, {
-    "url" : "https://virtserver.swaggerhub.com/JWinkler05/MED_DATASTORE_API/1.0.0",
+    "url" : "https://virtserver.swaggerhub.com/dotmed/MED_PARTNER_API/1.0.0",
     "description" : "SwaggerHub API Auto Mocking"
   } ],
   "security" : [ {
