@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "The Trust.med Partner API",
-    "description": "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
+    "description": "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. \nAlso allows for partners to send messages to eachother in JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
     "termsOfService": "https://www.trust.med/terms-and-conditions/",
     "contact": {
       "name": "Trust.med Support",
@@ -90,41 +90,15 @@
         }
       }
     },
-    "/client/{clientGLN}/message": {
+    "/client/message": {
       "post": {
         "tags": [
           "Message"
         ],
-        "description": "Send a message to a client as a JSON object with a message parameter",
-        "parameters": [
-          {
-            "name": "clientGLN",
-            "in": "path",
-            "description": "The GLN of the client receiving the message",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "string",
-              "format": "string"
-            }
-          },
-          {
-            "name": "messageFromGLN",
-            "in": "query",
-            "description": "The GLN of the location sending the message to the client.",
-            "required": true,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string",
-              "format": "string"
-            }
-          }
-        ],
+        "description": "Send a message to a client as an XML object with a message parameter",
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/xml": {
               "schema": {
                 "$ref": "#/components/schemas/Message"
               }
@@ -157,7 +131,10 @@
       "Message": {
         "type": "object",
         "properties": {
-          "message": {
+          "StandardBusinessDocumentHeader": {
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader"
+          },
+          "MessageText": {
             "type": "string",
             "format": "string"
           }
@@ -180,7 +157,7 @@
             }
           },
           "StandardBusinessDocumentHeader": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader"
           },
           "EPCISBody": {
             "$ref": "#/components/schemas/EPCISDocument_EPCISBody"
@@ -266,7 +243,7 @@
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader_Sender_ContactInformation": {
+      "Message_StandardBusinessDocumentHeader_Sender_ContactInformation": {
         "type": "object",
         "properties": {
           "Contact": {
@@ -291,7 +268,7 @@
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader_Sender": {
+      "Message_StandardBusinessDocumentHeader_Sender": {
         "type": "object",
         "properties": {
           "Identifier": {
@@ -309,11 +286,11 @@
             "example": "6903148000007"
           },
           "ContactInformation": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Sender_ContactInformation"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Sender_ContactInformation"
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader_Receiver_ContactInformation": {
+      "Message_StandardBusinessDocumentHeader_Receiver_ContactInformation": {
         "type": "object",
         "properties": {
           "Contact": {
@@ -338,7 +315,7 @@
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader_Receiver": {
+      "Message_StandardBusinessDocumentHeader_Receiver": {
         "type": "object",
         "properties": {
           "Identifier": {
@@ -356,11 +333,11 @@
             "example": "2203148000007"
           },
           "ContactInformation": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Receiver_ContactInformation"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Receiver_ContactInformation"
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader_DocumentIdentification": {
+      "Message_StandardBusinessDocumentHeader_DocumentIdentification": {
         "type": "object",
         "properties": {
           "Standard": {
@@ -389,7 +366,7 @@
           }
         }
       },
-      "EPCISDocument_StandardBusinessDocumentHeader": {
+      "Message_StandardBusinessDocumentHeader": {
         "type": "object",
         "properties": {
           "HeaderVersion": {
@@ -397,13 +374,13 @@
             "example": "1.0"
           },
           "Sender": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Sender"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Sender"
           },
           "Receiver": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Receiver"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Receiver"
           },
           "DocumentIdentification": {
-            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_DocumentIdentification"
+            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_DocumentIdentification"
           }
         },
         "xml": {
