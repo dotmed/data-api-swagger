@@ -1,418 +1,533 @@
 {
-  "openapi" : "3.0.0",
-  "info" : {
-    "title" : "The Trust.med Partner API",
-    "description" : "API that facilitates the storage of data for partners in multiple formats. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
-    "termsOfService" : "https://www.trust.med/terms-and-conditions/",
-    "contact" : {
-      "name" : "Trust.med Support",
-      "email" : "support@trust.med"
+  "openapi": "3.0.0",
+  "info": {
+    "title": "The Trust.med Partner API",
+    "description": "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. Also allows for partners to send messages to eachother\nin JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
+    "termsOfService": "https://www.trust.med/terms-and-conditions/",
+    "contact": {
+      "name": "Trust.med Support",
+      "email": "support@trust.med"
     },
-    "version" : "1.0.0"
+    "version": "1.0.0"
   },
-  "servers" : [ {
-    "url" : "https://staging.partner.trust.med/v1",
-    "description" : "Testing server"
-  }, {
-    "url" : "https://virtserver.swaggerhub.com/dotmed/MED_PARTNER_API/1.0.0",
-    "description" : "SwaggerHub API Auto Mocking"
-  } ],
-  "security" : [ {
-    "bearerAuth" : [ ]
-  } ],
-  "paths" : {
-    "/token" : {
-      "post" : {
-        "tags" : [ "Authentication" ],
-        "description" : "Gather a bearer token to be utilized throughout the API for authentication.",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/token_body"
+  "servers": [
+    {
+      "url": "https://staging.partner.trust.med/v1",
+      "description": "Testing server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/token": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Gather a bearer token to be utilized throughout the API for authentication.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/token_body"
               }
             }
           }
         },
-        "responses" : {
-          "200" : {
-            "description" : "Proper authentication of the user, a token is returned.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200"
+        "responses": {
+          "200": {
+            "description": "Proper authentication of the user, a token is returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Invalid credentials provided."
+          "401": {
+            "description": "Invalid credentials provided."
           }
         },
-        "security" : [ ]
+        "security": []
       }
     },
-    "/client/{clientGLN}/storage" : {
-      "post" : {
-        "tags" : [ "Storage" ],
-        "description" : "Send and store data documents within the Trust.med system. Currently is able to accept the following as request content types: JSON Documents, XML EPCIS Event or a Binary file.",
-        "parameters" : [ {
-          "name" : "clientGLN",
-          "in" : "path",
-          "description" : "The GLN of the client for which the posted file should be attributed.",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string",
-            "format" : "string"
-          }
-        }, {
-          "name" : "shipToGLN",
-          "in" : "query",
-          "description" : "The destination GLN for the file being stored",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string",
-            "format" : "string"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/xml" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/EPCISDocument"
-              }
-            },
-            "application/json" : {
-              "schema" : {
-                "type" : "object"
-              }
-            },
-            "application/octet-stream" : {
-              "schema" : {
-                "type" : "string",
-                "format" : "binary"
+    "/client/storage": {
+      "post": {
+        "tags": [
+          "Storage"
+        ],
+        "description": "Send and store data documents XML EPCIS Event with GS1 SBDH within the Trust.med system.",
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/EPCISDocument"
               }
             }
           }
         },
-        "responses" : {
-          "201" : {
-            "description" : "Successfull storage of data within the Trust.med system",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_201"
+        "responses": {
+          "201": {
+            "description": "Successfull storage of data within the Trust.med system",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_201"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "User's credentials or token is invalid."
+          "401": {
+            "description": "User's credentials or token is invalid."
           },
-          "404" : {
-            "description" : "ClientGLN provided is not found."
+          "404": {
+            "description": "ClientGLN provided is not found."
           }
         }
       }
     },
-    "/client/{clientGLN}/message" : {
-      "post" : {
-        "tags" : [ "Message" ],
-        "description" : "Send a message to a client as a JSON object with a message parameter",
-        "parameters" : [ {
-          "name" : "clientGLN",
-          "in" : "path",
-          "description" : "The GLN of the client receiving the message",
-          "required" : true,
-          "style" : "simple",
-          "explode" : false,
-          "schema" : {
-            "type" : "string",
-            "format" : "string"
+    "/client/{clientGLN}/message": {
+      "post": {
+        "tags": [
+          "Message"
+        ],
+        "description": "Send a message to a client as a JSON object with a message parameter",
+        "parameters": [
+          {
+            "name": "clientGLN",
+            "in": "path",
+            "description": "The GLN of the client receiving the message",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "messageFromGLN",
+            "in": "query",
+            "description": "The GLN of the location sending the message to the client.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
           }
-        }, {
-          "name" : "messageFromGLN",
-          "in" : "query",
-          "description" : "The GLN of the location sending the message to the client.",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string",
-            "format" : "string"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/Message"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Message"
               }
             }
           }
         },
-        "responses" : {
-          "200" : {
-            "description" : "Message was successfully sent to partner.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/inline_response_200_1"
+        "responses": {
+          "200": {
+            "description": "Message was successfully sent to partner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "User's credentials or token is invalid."
+          "401": {
+            "description": "User's credentials or token is invalid."
           },
-          "404" : {
-            "description" : "ClientGLN provided is not found."
+          "404": {
+            "description": "ClientGLN provided is not found."
           }
         }
       }
     }
   },
-  "components" : {
-    "schemas" : {
-      "Message" : {
-        "type" : "object",
-        "properties" : {
-          "message" : {
-            "type" : "string",
-            "format" : "string"
+  "components": {
+    "schemas": {
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "format": "string"
           }
         }
       },
-      "EPCISDocument" : {
-        "type" : "object",
-        "properties" : {
-          "schemaVersion" : {
-            "type" : "string",
-            "xml" : {
-              "attribute" : true
+      "EPCISDocument": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "string",
+            "xml": {
+              "attribute": true
             }
           },
-          "creationDate" : {
-            "type" : "string",
-            "format" : "date",
-            "xml" : {
-              "attribute" : true
+          "creationDate": {
+            "type": "string",
+            "format": "date",
+            "xml": {
+              "attribute": true
             }
           },
-          "EPCISBody" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody"
+          "StandardBusinessDocumentHeader": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader"
+          },
+          "EPCISBody": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody"
           }
         },
-        "description" : "An ObjectEvent for an EPCIS File",
-        "xml" : {
-          "namespace" : "urn:epcglobal:epcis:xsd:1",
-          "prefix" : "epcis"
+        "description": "An ObjectEvent for an EPCIS File",
+        "xml": {
+          "namespace": "urn:epcglobal:epcis:xsd:1",
+          "prefix": "epcis"
         }
       },
-      "token_body" : {
-        "type" : "object",
-        "properties" : {
-          "client_id" : {
-            "type" : "string",
-            "description" : "Will always be 'dotmed'.",
-            "example" : "dotmed"
+      "token_body": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "Will always be 'dotmed'.",
+            "example": "dotmed"
           },
-          "scope" : {
-            "type" : "string",
-            "description" : "Will always be 'openid'.",
-            "example" : "openid"
+          "scope": {
+            "type": "string",
+            "description": "Will always be 'openid'.",
+            "example": "openid"
           },
-          "username" : {
-            "type" : "string",
-            "description" : "Your username for the Trust.med Data API."
+          "username": {
+            "type": "string",
+            "description": "Your username for the Trust.med Data API."
           },
-          "password" : {
-            "type" : "string",
-            "description" : "You password for the Trust.med Data API."
+          "password": {
+            "type": "string",
+            "description": "You password for the Trust.med Data API."
           }
         }
       },
-      "inline_response_200" : {
-        "type" : "object",
-        "properties" : {
-          "access_token" : {
-            "type" : "string",
-            "description" : "The Token needed to authorize further requests.",
-            "format" : "JWT",
-            "example" : "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFheWpLMU01bjJia21VQjhDdVM1VSJ9.eyJpc3MiOiJodHRwczo..."
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "The Token needed to authorize further requests.",
+            "format": "JWT",
+            "example": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFheWpLMU01bjJia21VQjhDdVM1VSJ9.eyJpc3MiOiJodHRwczo..."
           },
-          "expires_in" : {
-            "type" : "number",
-            "description" : "Amount of time in seconds until invalid.",
-            "example" : 9000
+          "expires_in": {
+            "type": "number",
+            "description": "Amount of time in seconds until invalid.",
+            "example": 9000
           },
-          "token_type" : {
-            "type" : "string",
-            "description" : "The type of token returned. Will always be bearer.",
-            "example" : "bearer"
+          "token_type": {
+            "type": "string",
+            "description": "The type of token returned. Will always be bearer.",
+            "example": "bearer"
           }
         }
       },
-      "inline_response_201" : {
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "format" : "uuid4",
-            "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
+      "inline_response_201": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "example": "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
           },
-          "created_at" : {
-            "type" : "string",
-            "format" : "date"
+          "created_at": {
+            "type": "string",
+            "format": "date"
           }
         }
       },
-      "inline_response_200_1" : {
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "format" : "uuid4",
-            "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
+      "inline_response_200_1": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "example": "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
           },
-          "message_body" : {
-            "type" : "string",
-            "format" : "string"
+          "message_body": {
+            "type": "string",
+            "format": "string"
           },
-          "message_sent" : {
-            "type" : "string",
-            "format" : "date"
+          "message_sent": {
+            "type": "string",
+            "format": "date"
           }
         }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList" : {
-        "type" : "object",
-        "properties" : {
-          "epc" : {
-            "type" : "string"
+      "EPCISDocument_StandardBusinessDocumentHeader_Sender_ContactInformation": {
+        "type": "object",
+        "properties": {
+          "Contact": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "EmailAddress": {
+            "type": "string",
+            "example": "John_Doe@purchasing.XYZretailer.com"
+          },
+          "FaxNumber": {
+            "type": "string",
+            "example": "tel: +1-212-555-1213"
+          },
+          "TelephoneNumber": {
+            "type": "string",
+            "example": "tel: +1-212-555-2122"
+          },
+          "ContactTypeIdentifier": {
+            "type": "string",
+            "example": "Buyer"
+          }
+        }
+      },
+      "EPCISDocument_StandardBusinessDocumentHeader_Sender": {
+        "type": "object",
+        "properties": {
+          "Identifier": {
+            "type": "string",
+            "properties": {
+              "Authority": {
+                "type": "string",
+                "example": "EAN.UCC",
+                "xml": {
+                  "attribute": true
+                }
+              }
+            },
+            "description": "This is the GLN of the sender.",
+            "example": "6903148000007"
+          },
+          "ContactInformation": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Sender_ContactInformation"
+          }
+        }
+      },
+      "EPCISDocument_StandardBusinessDocumentHeader_Receiver_ContactInformation": {
+        "type": "object",
+        "properties": {
+          "Contact": {
+            "type": "string",
+            "example": "Mary Smith"
+          },
+          "EmailAddress": {
+            "type": "string",
+            "example": "Mary_Smith@widgets.com"
+          },
+          "FaxNumber": {
+            "type": "string",
+            "example": "tel:+1-312-555-1214"
+          },
+          "TelephoneNumber": {
+            "type": "string",
+            "example": "tel:+1-312-555-2125"
+          },
+          "ContactTypeIdentifier": {
+            "type": "string",
+            "example": "Seller"
+          }
+        }
+      },
+      "EPCISDocument_StandardBusinessDocumentHeader_Receiver": {
+        "type": "object",
+        "properties": {
+          "Identifier": {
+            "type": "string",
+            "properties": {
+              "Authority": {
+                "type": "string",
+                "example": "EAN.UCC",
+                "xml": {
+                  "attribute": true
+                }
+              }
+            },
+            "description": "This is the GLN of the receiver.",
+            "example": "2203148000007"
+          },
+          "ContactInformation": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Receiver_ContactInformation"
+          }
+        }
+      },
+      "EPCISDocument_StandardBusinessDocumentHeader_DocumentIdentification": {
+        "type": "object",
+        "properties": {
+          "Standard": {
+            "type": "string",
+            "example": "EAN.UCC"
+          },
+          "TypeVersion": {
+            "type": "string",
+            "example": "2.1"
+          },
+          "InstanceIdentifier": {
+            "type": "string",
+            "example": "100002"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "MultipleType": {
+            "type": "boolean",
+            "example": false
+          },
+          "CreationDateAndTime": {
+            "type": "string",
+            "format": "datetime",
+            "example": "2006-01-10T12:00:01.000-05:00"
+          }
+        }
+      },
+      "EPCISDocument_StandardBusinessDocumentHeader": {
+        "type": "object",
+        "properties": {
+          "HeaderVersion": {
+            "type": "string",
+            "example": "1.0"
+          },
+          "Sender": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Sender"
+          },
+          "Receiver": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_Receiver"
+          },
+          "DocumentIdentification": {
+            "$ref": "#/components/schemas/EPCISDocument_StandardBusinessDocumentHeader_DocumentIdentification"
           }
         },
-        "example" : null
+        "xml": {
+          "namespace": "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader",
+          "prefix": "sh"
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string"
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList": {
+        "type": "object",
+        "properties": {
+          "epc": {
+            "type": "string"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList" : {
-        "type" : "object",
-        "properties" : {
-          "bizTransaction" : {
-            "type" : "string",
-            "properties" : {
-              "type" : {
-                "type" : "string",
-                "xml" : {
-                  "attribute" : true
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList": {
+        "type": "object",
+        "properties": {
+          "bizTransaction": {
+            "type": "string",
+            "properties": {
+              "type": {
+                "type": "string",
+                "xml": {
+                  "attribute": true
                 }
               }
             }
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList" : {
-        "type" : "object",
-        "properties" : {
-          "source" : {
-            "type" : "string"
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList" : {
-        "type" : "object",
-        "properties" : {
-          "destination" : {
-            "type" : "string"
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension" : {
-        "type" : "object",
-        "properties" : {
-          "sourceList" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList"
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension": {
+        "type": "object",
+        "properties": {
+          "sourceList": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList"
           },
-          "destinationList" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList"
+          "destinationList": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent" : {
-        "type" : "object",
-        "properties" : {
-          "eventTime" : {
-            "type" : "string",
-            "format" : "date"
+      "EPCISDocument_EPCISBody_EventList_ObjectEvent": {
+        "type": "object",
+        "properties": {
+          "eventTime": {
+            "type": "string",
+            "format": "date"
           },
-          "eventTimeZoneOffset" : {
-            "type" : "string"
+          "eventTimeZoneOffset": {
+            "type": "string"
           },
-          "epcList" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList"
+          "epcList": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList"
           },
-          "action" : {
-            "type" : "string"
+          "action": {
+            "type": "string"
           },
-          "bizStep" : {
-            "type" : "string"
+          "bizStep": {
+            "type": "string"
           },
-          "disposition" : {
-            "type" : "string"
+          "disposition": {
+            "type": "string"
           },
-          "readPoint" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
+          "readPoint": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
           },
-          "bizLocation" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
+          "bizLocation": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
           },
-          "bizTransactionList" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList"
+          "bizTransactionList": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList"
           },
-          "extension" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension"
+          "extension": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody_EventList" : {
-        "type" : "object",
-        "properties" : {
-          "ObjectEvent" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent"
+      "EPCISDocument_EPCISBody_EventList": {
+        "type": "object",
+        "properties": {
+          "ObjectEvent": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent"
           }
-        },
-        "example" : null
+        }
       },
-      "EPCISDocument_EPCISBody" : {
-        "type" : "object",
-        "properties" : {
-          "EventList" : {
-            "$ref" : "#/components/schemas/EPCISDocument_EPCISBody_EventList"
+      "EPCISDocument_EPCISBody": {
+        "type": "object",
+        "properties": {
+          "EventList": {
+            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList"
           }
-        },
-        "example" : null
+        }
       }
     },
-    "securitySchemes" : {
-      "bearerAuth" : {
-        "type" : "http",
-        "scheme" : "bearer",
-        "bearerFormat" : "JWT"
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
