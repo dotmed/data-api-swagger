@@ -60,7 +60,7 @@
         "tags": [
           "Storage"
         ],
-        "description": "Send and store data documents XML EPCIS Event with GS1 SBDH within the Trust.med system.",
+        "description": "Send and store data documents XML EPCIS Event with GS1 SBDH within the Trust.med system. \nThe GLN should be used in the SBDH Identifier object for the Sender and Receiver.",
         "requestBody": {
           "content": {
             "application/xml": {
