@@ -1,510 +1,501 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "The Trust.med Partner API",
-    "description": "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. \nAlso allows for partners to send messages to eachother in JSON format.\n***\n\\* Authentication Note\n---------\n\nThis API facilitates authentication through two different methods:\n1)  Token: A token is gathered and then appended to the header as \"Bearer\" in order to prove identity. \n2)  ** Certificate-based:  Certificates are traded and attached to the request.\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
-    "termsOfService": "https://www.trust.med/terms-and-conditions/",
-    "contact": {
-      "name": "Trust.med Support",
-      "email": "support@trust.med"
-    },
-    "version": "1.0.0"
+  "openapi" : "3.0.0",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "The Trust.med Partner API",
+    "description" : "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. \nAlso allows for partners to send messages to eachother in JSON format.\n***\n\\* Authentication Note\n---------\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
+    "termsOfService" : "https://www.trust.med/terms-and-conditions/",
+    "contact" : {
+      "name" : "Trust.med Support",
+      "email" : "support@trust.med"
+    }
   },
-  "servers": [
-    {
-      "url": "https://staging.partner.trust.med/v1",
-      "description": "Testing server"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
-  "paths": {
-    "/token": {
-      "post": {
-        "tags": [
-          "Authentication"
-        ],
-        "description": "Gather a bearer token to be utilized throughout the API for authentication.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/token_body"
+  "paths" : {
+    "/client/storage" : {
+      "post" : {
+        "description" : "Send and store data documents XML EPCIS Event with GS1 SBDH within the Trust.med system. The GLN should be used in the SBDH Identifier object for the Sender and Receiver.",
+        "requestBody" : {
+          "content" : {
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EPCISDocument"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Proper authentication of the user, a token is returned.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/inline_response_200"
+        "responses" : {
+          "201" : {
+            "description" : "Successfull storage of data within the Trust.med system",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "id" : {
+                      "type" : "string",
+                      "format" : "uuid4",
+                      "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
+                    },
+                    "created_at" : {
+                      "type" : "string",
+                      "format" : "date",
+                      "example" : "2022-01-01 00:00:00"
+                    }
+                  }
                 }
               }
             }
           },
-          "401": {
-            "description": "Invalid credentials provided."
+          "401" : {
+            "description" : "User's credentials or token is invalid."
+          },
+          "404" : {
+            "description" : "ClientGLN provided is not found."
           }
         },
-        "security": []
+        "tags" : [ "Storage" ]
       }
     },
-    "/client/storage": {
-      "post": {
-        "tags": [
-          "Storage"
-        ],
-        "description": "Send and store data documents XML EPCIS Event with GS1 SBDH within the Trust.med system. \nThe GLN should be used in the SBDH Identifier object for the Sender and Receiver.",
-        "requestBody": {
-          "content": {
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/EPCISDocument"
+    "/client/message" : {
+      "post" : {
+        "description" : "Send a message to a client as an XML object with a message parameter",
+        "requestBody" : {
+          "content" : {
+            "application/xml" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Message"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Successfull storage of data within the Trust.med system",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/inline_response_201"
+        "responses" : {
+          "200" : {
+            "description" : "Message was successfully sent to partner.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "properties" : {
+                    "id" : {
+                      "type" : "string",
+                      "format" : "uuid4",
+                      "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
+                    },
+                    "message_body" : {
+                      "type" : "string",
+                      "format" : "string"
+                    },
+                    "message_sent" : {
+                      "type" : "string",
+                      "format" : "date",
+                      "example" : "2022-01-01 00:00:00"
+                    }
+                  }
                 }
               }
             }
           },
-          "401": {
-            "description": "User's credentials or token is invalid."
+          "401" : {
+            "description" : "User's credentials or token is invalid."
           },
-          "404": {
-            "description": "ClientGLN provided is not found."
-          }
-        }
-      }
-    },
-    "/client/message": {
-      "post": {
-        "tags": [
-          "Message"
-        ],
-        "description": "Send a message to a client as an XML object with a message parameter",
-        "requestBody": {
-          "content": {
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Message"
-              }
-            }
+          "404" : {
+            "description" : "ClientGLN provided is not found."
           }
         },
-        "responses": {
-          "200": {
-            "description": "Message was successfully sent to partner.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/inline_response_200_1"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "User's credentials or token is invalid."
-          },
-          "404": {
-            "description": "ClientGLN provided is not found."
-          }
-        }
+        "tags" : [ "Message" ]
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Message": {
-        "type": "object",
-        "properties": {
-          "StandardBusinessDocumentHeader": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader"
-          },
-          "MessageText": {
-            "type": "string",
-            "format": "string"
-          }
-        }
-      },
-      "EPCISDocument": {
-        "type": "object",
-        "properties": {
-          "schemaVersion": {
-            "type": "string",
-            "xml": {
-              "attribute": true
-            }
-          },
-          "creationDate": {
-            "type": "string",
-            "format": "date",
-            "xml": {
-              "attribute": true
-            }
-          },
-          "StandardBusinessDocumentHeader": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader"
-          },
-          "EPCISBody": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody"
-          }
-        },
-        "description": "An ObjectEvent for an EPCIS File",
-        "xml": {
-          "namespace": "urn:epcglobal:epcis:xsd:1",
-          "prefix": "epcis"
-        }
-      },
-      "token_body": {
-        "type": "object",
-        "properties": {
-          "client_id": {
-            "type": "string",
-            "description": "Will always be 'dotmed'.",
-            "example": "dotmed"
-          },
-          "scope": {
-            "type": "string",
-            "description": "Will always be 'openid'.",
-            "example": "openid"
-          },
-          "username": {
-            "type": "string",
-            "description": "Your username for the Trust.med Data API."
-          },
-          "password": {
-            "type": "string",
-            "description": "You password for the Trust.med Data API."
-          }
-        }
-      },
-      "inline_response_200": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "description": "The Token needed to authorize further requests.",
-            "format": "JWT",
-            "example": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjFheWpLMU01bjJia21VQjhDdVM1VSJ9.eyJpc3MiOiJodHRwczo..."
-          },
-          "expires_in": {
-            "type": "number",
-            "description": "Amount of time in seconds until invalid.",
-            "example": 9000
-          },
-          "token_type": {
-            "type": "string",
-            "description": "The type of token returned. Will always be bearer.",
-            "example": "bearer"
-          }
-        }
-      },
-      "inline_response_201": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid4",
-            "example": "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "inline_response_200_1": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid4",
-            "example": "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
-          },
-          "message_body": {
-            "type": "string",
-            "format": "string"
-          },
-          "message_sent": {
-            "type": "string",
-            "format": "date"
-          }
-        }
-      },
-      "Message_StandardBusinessDocumentHeader_Sender_ContactInformation": {
-        "type": "object",
-        "properties": {
-          "Contact": {
-            "type": "string",
-            "example": "John Doe"
-          },
-          "EmailAddress": {
-            "type": "string",
-            "example": "John_Doe@purchasing.XYZretailer.com"
-          },
-          "FaxNumber": {
-            "type": "string",
-            "example": "tel: +1-212-555-1213"
-          },
-          "TelephoneNumber": {
-            "type": "string",
-            "example": "tel: +1-212-555-2122"
-          },
-          "ContactTypeIdentifier": {
-            "type": "string",
-            "example": "Buyer"
-          }
-        }
-      },
-      "Message_StandardBusinessDocumentHeader_Sender": {
-        "type": "object",
-        "properties": {
-          "Identifier": {
-            "type": "string",
-            "properties": {
-              "Authority": {
-                "type": "string",
-                "example": "EAN.UCC",
-                "xml": {
-                  "attribute": true
+  "servers" : [ {
+    "description" : "SwaggerHub API Auto Mocking",
+    "url" : "https://virtserver.swaggerhub.com/JWinkler05/MED_PARTNER_API_V2/1.0.0"
+  }, {
+    "description" : "Testing server",
+    "url" : "https://staging.partner.trust.med/v1"
+  } ],
+  "components" : {
+    "schemas" : {
+      "Message" : {
+        "type" : "object",
+        "properties" : {
+          "StandardBusinessDocumentHeader" : {
+            "type" : "object",
+            "properties" : {
+              "HeaderVersion" : {
+                "type" : "string",
+                "example" : "1.0"
+              },
+              "Sender" : {
+                "type" : "object",
+                "properties" : {
+                  "Identifier" : {
+                    "type" : "string",
+                    "example" : "6903148000007",
+                    "description" : "This is the GLN of the sender.",
+                    "properties" : {
+                      "Authority" : {
+                        "type" : "string",
+                        "example" : "EAN.UCC",
+                        "xml" : {
+                          "attribute" : true
+                        }
+                      }
+                    }
+                  },
+                  "ContactInformation" : {
+                    "type" : "object",
+                    "properties" : {
+                      "Contact" : {
+                        "type" : "string",
+                        "example" : "John Doe"
+                      },
+                      "EmailAddress" : {
+                        "type" : "string",
+                        "example" : "John_Doe@purchasing.XYZretailer.com"
+                      },
+                      "FaxNumber" : {
+                        "type" : "string",
+                        "example" : "tel: +1-212-555-1213"
+                      },
+                      "TelephoneNumber" : {
+                        "type" : "string",
+                        "example" : "tel: +1-212-555-2122"
+                      },
+                      "ContactTypeIdentifier" : {
+                        "type" : "string",
+                        "example" : "Buyer"
+                      }
+                    }
+                  }
+                }
+              },
+              "Receiver" : {
+                "type" : "object",
+                "properties" : {
+                  "Identifier" : {
+                    "type" : "string",
+                    "example" : "2203148000007",
+                    "description" : "This is the GLN of the receiver.",
+                    "properties" : {
+                      "Authority" : {
+                        "type" : "string",
+                        "example" : "EAN.UCC",
+                        "xml" : {
+                          "attribute" : true
+                        }
+                      }
+                    }
+                  },
+                  "ContactInformation" : {
+                    "type" : "object",
+                    "properties" : {
+                      "Contact" : {
+                        "type" : "string",
+                        "example" : "Mary Smith"
+                      },
+                      "EmailAddress" : {
+                        "type" : "string",
+                        "example" : "Mary_Smith@widgets.com"
+                      },
+                      "FaxNumber" : {
+                        "type" : "string",
+                        "example" : "tel:+1-312-555-1214"
+                      },
+                      "TelephoneNumber" : {
+                        "type" : "string",
+                        "example" : "tel:+1-312-555-2125"
+                      },
+                      "ContactTypeIdentifier" : {
+                        "type" : "string",
+                        "example" : "Seller"
+                      }
+                    }
+                  }
+                }
+              },
+              "DocumentIdentification" : {
+                "type" : "object",
+                "properties" : {
+                  "Standard" : {
+                    "type" : "string",
+                    "example" : "EAN.UCC"
+                  },
+                  "TypeVersion" : {
+                    "type" : "string",
+                    "example" : "2.1"
+                  },
+                  "InstanceIdentifier" : {
+                    "type" : "string",
+                    "example" : "100002"
+                  },
+                  "Type" : {
+                    "type" : "string"
+                  },
+                  "MultipleType" : {
+                    "type" : "boolean",
+                    "example" : false
+                  },
+                  "CreationDateAndTime" : {
+                    "type" : "string",
+                    "format" : "datetime",
+                    "example" : "2006-01-10T12:00:01.000-05:00"
+                  }
                 }
               }
             },
-            "description": "This is the GLN of the sender.",
-            "example": "6903148000007"
+            "xml" : {
+              "prefix" : "sh",
+              "namespace" : "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+            }
           },
-          "ContactInformation": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Sender_ContactInformation"
+          "MessageText" : {
+            "type" : "string",
+            "format" : "string"
           }
         }
       },
-      "Message_StandardBusinessDocumentHeader_Receiver_ContactInformation": {
-        "type": "object",
-        "properties": {
-          "Contact": {
-            "type": "string",
-            "example": "Mary Smith"
+      "EPCISDocument" : {
+        "type" : "object",
+        "properties" : {
+          "schemaVersion" : {
+            "type" : "string",
+            "xml" : {
+              "attribute" : true
+            }
           },
-          "EmailAddress": {
-            "type": "string",
-            "example": "Mary_Smith@widgets.com"
+          "creationDate" : {
+            "type" : "string",
+            "format" : "date",
+            "xml" : {
+              "attribute" : true
+            }
           },
-          "FaxNumber": {
-            "type": "string",
-            "example": "tel:+1-312-555-1214"
-          },
-          "TelephoneNumber": {
-            "type": "string",
-            "example": "tel:+1-312-555-2125"
-          },
-          "ContactTypeIdentifier": {
-            "type": "string",
-            "example": "Seller"
-          }
-        }
-      },
-      "Message_StandardBusinessDocumentHeader_Receiver": {
-        "type": "object",
-        "properties": {
-          "Identifier": {
-            "type": "string",
-            "properties": {
-              "Authority": {
-                "type": "string",
-                "example": "EAN.UCC",
-                "xml": {
-                  "attribute": true
+          "StandardBusinessDocumentHeader" : {
+            "type" : "object",
+            "properties" : {
+              "HeaderVersion" : {
+                "type" : "string",
+                "example" : "1.0"
+              },
+              "Sender" : {
+                "type" : "object",
+                "properties" : {
+                  "Identifier" : {
+                    "type" : "string",
+                    "example" : "6903148000007",
+                    "description" : "This is the GLN of the sender.",
+                    "properties" : {
+                      "Authority" : {
+                        "type" : "string",
+                        "example" : "EAN.UCC",
+                        "xml" : {
+                          "attribute" : true
+                        }
+                      }
+                    }
+                  },
+                  "ContactInformation" : {
+                    "type" : "object",
+                    "properties" : {
+                      "Contact" : {
+                        "type" : "string",
+                        "example" : "John Doe"
+                      },
+                      "EmailAddress" : {
+                        "type" : "string",
+                        "example" : "John_Doe@purchasing.XYZretailer.com"
+                      },
+                      "FaxNumber" : {
+                        "type" : "string",
+                        "example" : "tel: +1-212-555-1213"
+                      },
+                      "TelephoneNumber" : {
+                        "type" : "string",
+                        "example" : "tel: +1-212-555-2122"
+                      },
+                      "ContactTypeIdentifier" : {
+                        "type" : "string",
+                        "example" : "Buyer"
+                      }
+                    }
+                  }
+                }
+              },
+              "Receiver" : {
+                "type" : "object",
+                "properties" : {
+                  "Identifier" : {
+                    "type" : "string",
+                    "example" : "2203148000007",
+                    "description" : "This is the GLN of the receiver.",
+                    "properties" : {
+                      "Authority" : {
+                        "type" : "string",
+                        "example" : "EAN.UCC",
+                        "xml" : {
+                          "attribute" : true
+                        }
+                      }
+                    }
+                  },
+                  "ContactInformation" : {
+                    "type" : "object",
+                    "properties" : {
+                      "Contact" : {
+                        "type" : "string",
+                        "example" : "Mary Smith"
+                      },
+                      "EmailAddress" : {
+                        "type" : "string",
+                        "example" : "Mary_Smith@widgets.com"
+                      },
+                      "FaxNumber" : {
+                        "type" : "string",
+                        "example" : "tel:+1-312-555-1214"
+                      },
+                      "TelephoneNumber" : {
+                        "type" : "string",
+                        "example" : "tel:+1-312-555-2125"
+                      },
+                      "ContactTypeIdentifier" : {
+                        "type" : "string",
+                        "example" : "Seller"
+                      }
+                    }
+                  }
+                }
+              },
+              "DocumentIdentification" : {
+                "type" : "object",
+                "properties" : {
+                  "Standard" : {
+                    "type" : "string",
+                    "example" : "EAN.UCC"
+                  },
+                  "TypeVersion" : {
+                    "type" : "string",
+                    "example" : "2.1"
+                  },
+                  "InstanceIdentifier" : {
+                    "type" : "string",
+                    "example" : "100002"
+                  },
+                  "Type" : {
+                    "type" : "string"
+                  },
+                  "MultipleType" : {
+                    "type" : "boolean",
+                    "example" : false
+                  },
+                  "CreationDateAndTime" : {
+                    "type" : "string",
+                    "format" : "datetime",
+                    "example" : "2006-01-10T12:00:01.000-05:00"
+                  }
                 }
               }
             },
-            "description": "This is the GLN of the receiver.",
-            "example": "2203148000007"
+            "xml" : {
+              "prefix" : "sh",
+              "namespace" : "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader"
+            }
           },
-          "ContactInformation": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Receiver_ContactInformation"
-          }
-        }
-      },
-      "Message_StandardBusinessDocumentHeader_DocumentIdentification": {
-        "type": "object",
-        "properties": {
-          "Standard": {
-            "type": "string",
-            "example": "EAN.UCC"
-          },
-          "TypeVersion": {
-            "type": "string",
-            "example": "2.1"
-          },
-          "InstanceIdentifier": {
-            "type": "string",
-            "example": "100002"
-          },
-          "Type": {
-            "type": "string"
-          },
-          "MultipleType": {
-            "type": "boolean",
-            "example": false
-          },
-          "CreationDateAndTime": {
-            "type": "string",
-            "format": "datetime",
-            "example": "2006-01-10T12:00:01.000-05:00"
-          }
-        }
-      },
-      "Message_StandardBusinessDocumentHeader": {
-        "type": "object",
-        "properties": {
-          "HeaderVersion": {
-            "type": "string",
-            "example": "1.0"
-          },
-          "Sender": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Sender"
-          },
-          "Receiver": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_Receiver"
-          },
-          "DocumentIdentification": {
-            "$ref": "#/components/schemas/Message_StandardBusinessDocumentHeader_DocumentIdentification"
-          }
-        },
-        "xml": {
-          "namespace": "http://www.unece.org/cefact/namespaces/StandardBusinessDocumentHeader",
-          "prefix": "sh"
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList": {
-        "type": "object",
-        "properties": {
-          "epc": {
-            "type": "string"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList": {
-        "type": "object",
-        "properties": {
-          "bizTransaction": {
-            "type": "string",
-            "properties": {
-              "type": {
-                "type": "string",
-                "xml": {
-                  "attribute": true
+          "EPCISBody" : {
+            "type" : "object",
+            "properties" : {
+              "EventList" : {
+                "type" : "object",
+                "properties" : {
+                  "ObjectEvent" : {
+                    "type" : "object",
+                    "properties" : {
+                      "eventTime" : {
+                        "type" : "string",
+                        "format" : "date"
+                      },
+                      "eventTimeZoneOffset" : {
+                        "type" : "string"
+                      },
+                      "epcList" : {
+                        "type" : "object",
+                        "properties" : {
+                          "epc" : {
+                            "type" : "string"
+                          }
+                        }
+                      },
+                      "action" : {
+                        "type" : "string"
+                      },
+                      "bizStep" : {
+                        "type" : "string"
+                      },
+                      "disposition" : {
+                        "type" : "string"
+                      },
+                      "readPoint" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          }
+                        }
+                      },
+                      "bizLocation" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id" : {
+                            "type" : "string"
+                          }
+                        }
+                      },
+                      "bizTransactionList" : {
+                        "type" : "object",
+                        "properties" : {
+                          "bizTransaction" : {
+                            "type" : "string",
+                            "properties" : {
+                              "type" : {
+                                "type" : "string",
+                                "xml" : {
+                                  "attribute" : true
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "extension" : {
+                        "type" : "object",
+                        "properties" : {
+                          "sourceList" : {
+                            "type" : "object",
+                            "properties" : {
+                              "source" : {
+                                "type" : "string"
+                              }
+                            }
+                          },
+                          "destinationList" : {
+                            "type" : "object",
+                            "properties" : {
+                              "destination" : {
+                                "type" : "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           }
+        },
+        "description" : "An ObjectEvent for an EPCIS File",
+        "xml" : {
+          "prefix" : "epcis",
+          "namespace" : "urn:epcglobal:epcis:xsd:1"
         }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList": {
-        "type": "object",
-        "properties": {
-          "source": {
-            "type": "string"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList": {
-        "type": "object",
-        "properties": {
-          "destination": {
-            "type": "string"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent_extension": {
-        "type": "object",
-        "properties": {
-          "sourceList": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_sourceList"
-          },
-          "destinationList": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension_destinationList"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList_ObjectEvent": {
-        "type": "object",
-        "properties": {
-          "eventTime": {
-            "type": "string",
-            "format": "date"
-          },
-          "eventTimeZoneOffset": {
-            "type": "string"
-          },
-          "epcList": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_epcList"
-          },
-          "action": {
-            "type": "string"
-          },
-          "bizStep": {
-            "type": "string"
-          },
-          "disposition": {
-            "type": "string"
-          },
-          "readPoint": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
-          },
-          "bizLocation": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_readPoint"
-          },
-          "bizTransactionList": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_bizTransactionList"
-          },
-          "extension": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent_extension"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody_EventList": {
-        "type": "object",
-        "properties": {
-          "ObjectEvent": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList_ObjectEvent"
-          }
-        }
-      },
-      "EPCISDocument_EPCISBody": {
-        "type": "object",
-        "properties": {
-          "EventList": {
-            "$ref": "#/components/schemas/EPCISDocument_EPCISBody_EventList"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
       }
     }
   }
