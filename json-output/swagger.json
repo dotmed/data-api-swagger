@@ -105,9 +105,6 @@
     }
   },
   "servers" : [ {
-    "description" : "SwaggerHub API Auto Mocking",
-    "url" : "https://virtserver.swaggerhub.com/dotmed/MED_PARTNER_API_V2/1.0.0"
-  }, {
     "description" : "Testing server",
     "url" : "https://staging.partner.trust.med/v1"
   } ],
