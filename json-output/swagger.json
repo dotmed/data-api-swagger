@@ -2,7 +2,7 @@
   "openapi" : "3.0.0",
   "info" : {
     "version" : "1.0.0",
-    "title" : "The Trust.med Partner API",
+    "title" : "The Trust.med Data API",
     "description" : "API that facilitates the storage of EPCIS data for partners as an XML file with a Standard Business Document Header. \nAlso allows for partners to send messages to eachother in JSON format.\n***\n\\* Authentication Note\n---------\n\n** Note: In order to configure Certificate Based Authentication, please contact our Trust.med support team, \nwe will assist you in completing the following:\n\n1) Generate a self-signing CA Cert (or use an accepted signed like Verisign).\n2) Trade public keys of CA or CA bundles with Trust.med.\n3) Generate and sign your client certificate using the CA from above.\n4) Provide your signed client certificate with all requests.\n\n***\n",
     "termsOfService" : "https://www.trust.med/terms-and-conditions/",
     "contact" : {
@@ -53,54 +53,6 @@
           }
         },
         "tags" : [ "Storage" ]
-      }
-    },
-    "/client/message" : {
-      "post" : {
-        "description" : "Send a message to a client as an XML object with a message parameter",
-        "requestBody" : {
-          "content" : {
-            "application/xml" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/Message"
-              }
-            }
-          }
-        },
-        "responses" : {
-          "200" : {
-            "description" : "Message was successfully sent to partner.",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "properties" : {
-                    "id" : {
-                      "type" : "string",
-                      "format" : "uuid4",
-                      "example" : "80097006-1dff-4fb7-8457-a07c1e7bfd7c"
-                    },
-                    "message_body" : {
-                      "type" : "string",
-                      "format" : "string"
-                    },
-                    "message_sent" : {
-                      "type" : "string",
-                      "format" : "date",
-                      "example" : "2022-01-01 00:00:00"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "User's credentials or token is invalid."
-          },
-          "404" : {
-            "description" : "ClientGLN provided is not found."
-          }
-        },
-        "tags" : [ "Message" ]
       }
     }
   },
